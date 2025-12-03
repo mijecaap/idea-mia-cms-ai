@@ -1,0 +1,169 @@
+// Prisma Schema for CMS AI Agent
+// Shares PostgreSQL with Strapi - uses separate "cms_ai" schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["cms_ai"]
+}
+
+// ============================================
+// Authentication & Users
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  strapiUserId  Int?      // Reference to Strapi admin user
+  strapiToken   String?   // Encrypted Strapi API token
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relations
+  sessions      ChatSession[]
+  actionLogs    ActionLog[]
+
+  @@schema("cms_ai")
+  @@map("users")
+}
+
+// ============================================
+// Chat Sessions & Messages
+// ============================================
+
+model ChatSession {
+  id          String    @id @default(cuid())
+  title       String?   // Auto-generated from first message
+  userId      String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relations
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages    ChatMessage[]
+
+  @@index([userId])
+  @@schema("cms_ai")
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id          String    @id @default(cuid())
+  sessionId   String
+  role        MessageRole
+  content     String    @db.Text
+  imageUrl    String?   // For multimodal messages
+  metadata    Json?     // Additional message metadata
+  createdAt   DateTime  @default(now())
+  
+  // Relations
+  session     ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@schema("cms_ai")
+  @@map("chat_messages")
+}
+
+enum MessageRole {
+  user
+  assistant
+  system
+  tool
+
+  @@schema("cms_ai")
+}
+
+// ============================================
+// Pending Actions (for confirmation flow)
+// ============================================
+
+model PendingAction {
+  id            String        @id @default(cuid())
+  sessionId     String
+  actionType    ActionType
+  contentType   String        // Strapi content type (e.g., "product", "article")
+  payload       Json          // The action payload to execute
+  description   String        // Human-readable description
+  status        ActionStatus  @default(pending)
+  expiresAt     DateTime      // Auto-expire after timeout
+  createdAt     DateTime      @default(now())
+  resolvedAt    DateTime?
+  
+  @@index([sessionId, status])
+  @@schema("cms_ai")
+  @@map("pending_actions")
+}
+
+enum ActionType {
+  create
+  update
+  delete
+  publish
+  unpublish
+  batch_create
+  batch_update
+  batch_delete
+
+  @@schema("cms_ai")
+}
+
+enum ActionStatus {
+  pending
+  approved
+  rejected
+  expired
+  executed
+
+  @@schema("cms_ai")
+}
+
+// ============================================
+// Action Logs (audit trail)
+// ============================================
+
+model ActionLog {
+  id            String      @id @default(cuid())
+  userId        String
+  sessionId     String?
+  actionType    ActionType
+  contentType   String
+  contentId     String?     // Strapi content ID if applicable
+  payload       Json?       // Request payload
+  response      Json?       // Strapi response
+  success       Boolean
+  errorMessage  String?
+  executedAt    DateTime    @default(now())
+  
+  // Relations
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionId])
+  @@index([contentType])
+  @@schema("cms_ai")
+  @@map("action_logs")
+}
+
+// ============================================
+// Webhook Events (for Strapi sync)
+// ============================================
+
+model WebhookEvent {
+  id            String    @id @default(cuid())
+  event         String    // e.g., "entry.create", "entry.update"
+  model         String    // Strapi model name
+  entryId       String?   // Strapi entry ID
+  payload       Json
+  processed     Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+
+  @@index([processed])
+  @@index([model])
+  @@schema("cms_ai")
+  @@map("webhook_events")
+}
