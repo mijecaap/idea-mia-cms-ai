@@ -208,9 +208,9 @@ export function ChatContainer() {
       />
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-h-0">
         {/* Header */}
-        <header className="border-b px-4 py-3 flex items-center justify-between">
+        <header className="border-b px-4 py-3 flex items-center justify-between shrink-0">
           <div>
             <h1 className="font-semibold">CMS AI Agent</h1>
             <p className="text-xs text-muted-foreground">

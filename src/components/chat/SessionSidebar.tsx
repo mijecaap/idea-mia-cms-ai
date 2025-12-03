@@ -80,11 +80,11 @@ export function SessionSidebar({
                 onClick={() => onSelectSession(session.id)}
               >
                 <MessageSquare className="h-4 w-4 shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">
+                <div className="flex-1 overflow-hidden">
+                  <p className="text-sm font-medium truncate max-w-[140px]">
                     {session.title || "Nueva conversación"}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground truncate">
                     {formatDate(session.updatedAt)}
                     {session.messageCount !== undefined && (
                       <span> · {session.messageCount} msgs</span>
@@ -98,7 +98,7 @@ export function SessionSidebar({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-6 w-6 opacity-0 group-hover:opacity-100"
+                      className="h-6 w-6 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <MoreVertical className="h-3 w-3" />
