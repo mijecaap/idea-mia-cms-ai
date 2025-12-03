@@ -210,17 +210,25 @@ export interface ProductVariantInput {
 // Customization Schema Types
 // ============================================
 
+// Control types available for customization schemas (matches Strapi schema)
+export type CustomizationControlType =
+  | "input_text"
+  | "textarea"
+  | "select"
+  | "radio_group"
+  | "checkbox"
+  | "color_picker"
+  | "number"
+  | "image_upload";
+
 export interface CustomizationSchema {
   id: number;
   documentId: string;
   name: string;
   description?: string;
-  schema_type: "text" | "color" | "size" | "combo";
+  control_type: CustomizationControlType;
   config: Record<string, unknown>;
-  validation_rules?: Record<string, unknown>;
   preview_template?: string;
-  base_price?: number;
-  price_per_character?: number;
   is_active: boolean;
   sort_order: number;
   createdAt: string;
@@ -232,12 +240,9 @@ export interface CustomizationSchema {
 export interface CustomizationSchemaInput {
   name: string;
   description?: string;
-  schema_type: "text" | "color" | "size" | "combo";
+  control_type: CustomizationControlType;
   config: Record<string, unknown>;
-  validation_rules?: Record<string, unknown>;
   preview_template?: string;
-  base_price?: number;
-  price_per_character?: number;
   is_active?: boolean;
   sort_order?: number;
   products?: string[]; // Array of product documentIds for many-to-many relation
