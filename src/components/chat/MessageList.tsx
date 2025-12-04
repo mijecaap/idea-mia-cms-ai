@@ -21,22 +21,22 @@ export function MessageList({ messages, isLoading = false }: MessageListProps) {
 
   if (messages.length === 0 && !isLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 flex items-center justify-center p-4 md:p-8">
         <div className="text-center max-w-md">
-          <h2 className="text-2xl font-semibold mb-2">
+          <h2 className="text-xl md:text-2xl font-semibold mb-2">
             ¡Bienvenido al CMS AI Agent!
           </h2>
-          <p className="text-muted-foreground mb-4">
+          <p className="text-muted-foreground mb-4 text-sm md:text-base">
             Soy tu asistente para gestionar el contenido de tu tienda. Puedo ayudarte a:
           </p>
-          <ul className="text-sm text-muted-foreground text-left space-y-2">
+          <ul className="text-xs md:text-sm text-muted-foreground text-left space-y-2">
             <li>📦 Crear y editar productos</li>
             <li>📂 Organizar categorías</li>
             <li>📝 Escribir artículos para el blog</li>
             <li>📊 Consultar órdenes y estadísticas</li>
             <li>🖼️ Analizar imágenes para crear contenido</li>
           </ul>
-          <p className="text-sm text-muted-foreground mt-4">
+          <p className="text-xs md:text-sm text-muted-foreground mt-4">
             Escribe tu primera pregunta o sube una imagen para comenzar.
           </p>
         </div>
@@ -45,7 +45,7 @@ export function MessageList({ messages, isLoading = false }: MessageListProps) {
   }
 
   return (
-    <ScrollArea className="flex-1 min-h-0 p-4">
+    <ScrollArea className="flex-1 min-h-0 p-2 md:p-4">
       <div className="space-y-4 max-w-4xl mx-auto">
         {messages.map((message) => (
           <ChatMessage key={message.id} message={message} />
