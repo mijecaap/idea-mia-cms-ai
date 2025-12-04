@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { toast } from "sonner";
 import { MessageList } from "./MessageList";
@@ -16,11 +16,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useChatStore, Message } from "@/lib/store";
-import { LogOut, Settings, User } from "lucide-react";
+import { LogOut, Menu, Settings, User } from "lucide-react";
 
 export function ChatContainer() {
   const { data: session } = useSession();
   const skipFetchRef = useRef(false); // Flag to skip fetching messages after creating new session
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const {
     currentSessionId,
     messages,
@@ -202,6 +203,8 @@ export function ChatContainer() {
         sessions={sessions}
         currentSessionId={currentSessionId}
         isLoading={sessionsLoading}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
         onSelectSession={handleSelectSession}
         onNewSession={handleNewSession}
         onDeleteSession={handleDeleteSession}
@@ -210,12 +213,24 @@ export function ChatContainer() {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col min-h-0">
         {/* Header */}
-        <header className="border-b px-4 py-3 flex items-center justify-between shrink-0">
-          <div>
-            <h1 className="font-semibold">CMS AI Agent</h1>
-            <p className="text-xs text-muted-foreground">
-              Gestiona tu contenido con inteligencia artificial
-            </p>
+        <header className="border-b px-2 md:px-4 py-3 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2">
+            {/* Hamburger menu - visible only on mobile */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden shrink-0"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Abrir menú"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="font-semibold text-sm md:text-base">CMS AI Agent</h1>
+              <p className="text-xs text-muted-foreground hidden sm:block">
+                Gestiona tu contenido con inteligencia artificial
+              </p>
+            </div>
           </div>
 
           {/* User Menu */}

@@ -9,13 +9,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MessageSquare, MoreVertical, Plus, Trash2 } from "lucide-react";
+import { MessageSquare, MoreVertical, Plus, Trash2, X } from "lucide-react";
 import { ChatSession } from "@/lib/store";
 
 interface SessionSidebarProps {
   sessions: ChatSession[];
   currentSessionId: string | null;
   isLoading?: boolean;
+  isOpen?: boolean;
+  onClose?: () => void;
   onSelectSession: (sessionId: string) => void;
   onNewSession: () => void;
   onDeleteSession: (sessionId: string) => void;
@@ -25,10 +27,23 @@ export function SessionSidebar({
   sessions,
   currentSessionId,
   isLoading = false,
+  isOpen = false,
+  onClose,
   onSelectSession,
   onNewSession,
   onDeleteSession,
 }: SessionSidebarProps) {
+  const handleSelectSession = (sessionId: string) => {
+    onSelectSession(sessionId);
+    // Close sidebar on mobile after selection
+    onClose?.();
+  };
+
+  const handleNewSession = () => {
+    onNewSession();
+    // Close sidebar on mobile after creating new session
+    onClose?.();
+  };
   const formatDate = (date: Date) => {
     const now = new Date();
     const messageDate = new Date(date);
@@ -46,14 +61,42 @@ export function SessionSidebar({
   };
 
   return (
-    <div className="w-64 border-r bg-muted/30 flex flex-col">
-      {/* Header */}
-      <div className="p-4">
-        <Button onClick={onNewSession} className="w-full gap-2">
-          <Plus className="h-4 w-4" />
-          Nueva conversación
-        </Button>
-      </div>
+    <>
+      {/* Mobile overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Sidebar */}
+      <div
+        className={`
+          fixed inset-y-0 left-0 z-50 w-64 border-r bg-muted/30 flex flex-col
+          transform transition-transform duration-300 ease-in-out
+          md:relative md:translate-x-0 md:z-auto
+          ${isOpen ? "translate-x-0" : "-translate-x-full"}
+        `}
+      >
+        {/* Header */}
+        <div className="p-4 flex items-center gap-2">
+          <Button onClick={handleNewSession} className="flex-1 gap-2">
+            <Plus className="h-4 w-4" />
+            Nueva conversación
+          </Button>
+          {/* Close button - visible only on mobile */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden shrink-0"
+            onClick={onClose}
+            aria-label="Cerrar menú"
+          >
+            <X className="h-5 w-5" />
+          </Button>
+        </div>
 
       <Separator />
 
@@ -77,7 +120,7 @@ export function SessionSidebar({
                     ? "bg-primary/10 text-primary"
                     : "hover:bg-muted"
                 }`}
-                onClick={() => onSelectSession(session.id)}
+                onClick={() => handleSelectSession(session.id)}
               >
                 <MessageSquare className="h-4 w-4 shrink-0" />
                 <div className="flex-1 overflow-hidden">
@@ -123,5 +166,6 @@ export function SessionSidebar({
         </div>
       </ScrollArea>
     </div>
+    </>
   );
 }

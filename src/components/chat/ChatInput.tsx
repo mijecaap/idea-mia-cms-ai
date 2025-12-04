@@ -73,7 +73,7 @@ export function ChatInput({ onSend, isLoading = false, disabled = false }: ChatI
 
   return (
     <div
-      className={`border-t bg-background p-4 ${
+      className={`border-t bg-background p-2 md:p-4 ${
         isDragging ? "ring-2 ring-primary ring-inset" : ""
       }`}
       onDrop={handleDrop}
@@ -115,6 +115,7 @@ export function ChatInput({ onSend, isLoading = false, disabled = false }: ChatI
         <Button
           variant="outline"
           size="icon"
+          className="h-11 w-11 shrink-0"
           onClick={() => fileInputRef.current?.click()}
           disabled={isLoading || disabled}
           title="Adjuntar imagen"
@@ -143,6 +144,7 @@ export function ChatInput({ onSend, isLoading = false, disabled = false }: ChatI
           onClick={handleSubmit}
           disabled={(!message.trim() && !imagePreview) || isLoading || disabled}
           size="icon"
+          className="h-11 w-11 shrink-0"
         >
           {isLoading ? (
             <Loader2 className="h-4 w-4 animate-spin" />
