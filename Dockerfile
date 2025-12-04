@@ -23,6 +23,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Build-time argument for Prisma generate (provided by Dokploy)
+ARG DATABASE_URL
+
 # Generate Prisma client
 RUN npx prisma generate
 
